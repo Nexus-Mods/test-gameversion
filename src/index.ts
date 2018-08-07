@@ -27,7 +27,7 @@ async function testGameVersions(api: types.IExtensionApi): Promise<types.ITestRe
 
   const mods = state.persistent.mods[gameMode];
 
-  const incompatible = Object.keys(mods)
+  const incompatible = Object.keys(mods || {})
     .filter(modId => !isCompatible(gameMode, mods[modId], currentGameVersion));
   
   if (incompatible.length === 0) {
