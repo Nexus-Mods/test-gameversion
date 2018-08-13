@@ -39,7 +39,7 @@ async function testGameVersions(api: types.IExtensionApi): Promise<types.ITestRe
     description: {
       short: t('Incompatible mods'),
       long: t('Some mods are incompatible with the current game version, please check if updates are available:') + '\n'
-          + incompatible.join('\n'),
+          + incompatible.join('[br][/br]'),
     },
   };
 }

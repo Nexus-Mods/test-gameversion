@@ -29,7 +29,7 @@ function compareQuadVer(lhs: string, rhs: string) {
   const rhsArr = rhs.split('.').map(iter => parseInt(iter, 10));
 
   // by default use the 4-integer version scheme that windows uses for its executables
-  for (let i = 0; i < 4; ++i) {
+  for (let i = 0; i < Math.min(lhsArr.length, rhsArr.length); ++i) {
     const d = (lhsArr[i] || 0) - (rhsArr[i] || 0);
     if (d !== 0) {
       return d;
