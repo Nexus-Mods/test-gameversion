@@ -1,20 +1,46 @@
 import getVersion from 'exe-version';
 import * as path from 'path';
 import { types, util } from 'vortex-api';
+export type UpdateInvalidate = 'never' | 'always' | 'some';
+
+function gamebryoUpdate(seName: string) {
+  return `"${seName}" in particular and all plugins for it will need to be updated. `
+        + 'If this update was released only recently, you may have to wait for '
+        + `${seName} to be updated as well.`;
+}
 
 const gameSupport = {
-
+  oblivion: {
+    updateInvalidationText: gamebryoUpdate('obse'),
+  },
+  skyrim: {
+    updateInvalidationText: gamebryoUpdate('skse'),
+  },
+  skyrimse: {
+    updateInvalidationText: gamebryoUpdate('skse64'),
+  },
+  fallout3: {
+    updateInvalidationText: gamebryoUpdate('fose'),
+  },
+  falloutnv: {
+    updateInvalidationText: gamebryoUpdate('nvse'),
+  },
+  fallout4: {
+    updateInvalidationText: gamebryoUpdate('f4se'),
+  },
 };
 
 export function getGameVersion(api: types.IExtensionApi, gameMode: string): Promise<string> {
   // allow games to have specific functions to get at the version
-  if ((gameSupport[gameMode] !== undefined) && (gameSupport[gameMode].getGameVersion !== undefined)) {
+  if ((gameSupport[gameMode] !== undefined)
+      && (gameSupport[gameMode].getGameVersion !== undefined)) {
     return gameSupport[gameMode].getGameVersion(api);
   }
 
   // otherwise take the version stored in the executable
   const state: types.IState = api.store.getState();
-  const discovery: types.IDiscoveryResult = util.getSafe(state, ['settings', 'gameMode', 'discovered', gameMode], undefined);
+  const discovery: types.IDiscoveryResult =
+    util.getSafe(state, ['settings', 'gameMode', 'discovered', gameMode], undefined);
   if ((discovery === undefined) || (discovery.path === undefined)) {
     return Promise.resolve(undefined);
   }
@@ -40,9 +66,23 @@ function compareQuadVer(lhs: string, rhs: string) {
 
 export function versionCompare(gameMode: string, lhs: string, rhs: string): number {
   // allow games to have specific functions to compare versions
-  if ((gameSupport[gameMode] !== undefined) && (gameSupport[gameMode].versionCompare !== undefined)) {
+  if ((gameSupport[gameMode] !== undefined)
+      && (gameSupport[gameMode].versionCompare !== undefined)) {
     return gameSupport[gameMode].versionCompare(lhs, rhs);
   }
 
   return compareQuadVer(lhs, rhs);
+}
+
+export function updateInvalidatesMods(gameMode: string): UpdateInvalidate {
+  if ((gameSupport[gameMode] !== undefined)
+      && (gameSupport[gameMode].updateInvalidatesMods !== undefined)) {
+    return gameSupport[gameMode].updateInvalidatesMods;
+  }
+  // usually game updates invalidate some mods but not all
+  return 'some';
+}
+
+export function updateInvalidationText(gameMode: string): string {
+  return util.getSafe(gameSupport, [gameMode, 'updateInvalidationText'], undefined);
 }
