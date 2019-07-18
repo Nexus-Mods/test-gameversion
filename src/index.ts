@@ -54,6 +54,7 @@ async function testGameVersions(api: types.IExtensionApi): Promise<types.ITestRe
   if ((res === undefined)
       && (invalidates !== 'never')
       && (previousGameVersion !== undefined)
+      && (currentGameVersion !== undefined)
       && (previousGameVersion !== currentGameVersion)) {
     let text = 'The game has been updated from {{before}} to {{after}}.';
 
