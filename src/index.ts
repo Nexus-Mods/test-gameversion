@@ -2,7 +2,7 @@ import { getGameVersion, updateInvalidatesMods,
          updateInvalidationText, versionCompare } from './gamesupport';
 import persistentReducer from './reducers';
 
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import { selectors, types, util } from 'vortex-api';
 import { setGameVersion } from './actions';
 
