@@ -1,6 +1,7 @@
 import getVersion from 'exe-version';
 import * as path from 'path';
-import { types, util } from 'vortex-api';
+import semver from 'semver';
+import { log, types, util } from 'vortex-api';
 export type UpdateInvalidate = 'never' | 'always' | 'some';
 
 function gamebryoUpdate(seName: string) {
@@ -41,13 +42,37 @@ export function getGameVersion(api: types.IExtensionApi, gameMode: string): Prom
   const state: types.IState = api.store.getState();
   const discovery: types.IDiscoveryResult =
     util.getSafe(state, ['settings', 'gameMode', 'discovered', gameMode], undefined);
-  if ((discovery === undefined) || (discovery.path === undefined)) {
+  if (discovery?.path === undefined) {
     return Promise.resolve(undefined);
   }
-  const game = util.getGame(gameMode);
-  const exePath = path.join(discovery.path, discovery.executable || game.executable());
-  const version = getVersion(exePath);
-  return Promise.resolve(version);
+  const game: types.IGame = util.getGame(gameMode);
+  const getExecGameVersion = () => {
+    const exePath = path.join(discovery.path, discovery.executable || game.executable());
+    const version: string = getVersion(exePath);
+    return Promise.resolve(version);
+  };
+
+  const getExtGameVersion = async () => {
+    try {
+      const version = await game.getGameVersion(discovery.path);
+      return (semver.valid(version) !== null)
+        ? Promise.resolve(version)
+        : Promise.reject(new Error('game extension getGameVersion functor returned an invalid version'));
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  };
+
+  return (game?.getGameVersion === undefined)
+    ? getExecGameVersion()
+    : getExtGameVersion()
+      .catch(err => {
+        log('warn', 'getGameVersion call failed', {
+          message: err.message,
+          gameMode,
+        });
+        return getExecGameVersion();
+      });
 }
 
 function compareQuadVer(lhs: string, rhs: string) {
