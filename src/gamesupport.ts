@@ -54,7 +54,11 @@ export function getGameVersion(api: types.IExtensionApi, gameMode: string): Prom
 
   const getExtGameVersion = async () => {
     try {
-      const version = await game.getGameVersion(discovery.path);
+      const version: string = await game.getGameVersion(discovery.path);
+      if (typeof version !== 'string') {
+        return Promise.reject(new Error('getGameVersion functor returned an invalid type'));
+      }
+
       return (semver.valid(version) !== null)
         ? Promise.resolve(version)
         : Promise.reject(new Error('game extension getGameVersion functor returned an invalid version'));
