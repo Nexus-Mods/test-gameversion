@@ -88,12 +88,12 @@ async function testGameVersions(api: types.IExtensionApi): Promise<types.ITestRe
 }
 
 function init(context: types.IExtensionContext) {
+  context.registerReducer(['persistent', 'gameMode'], persistentReducer);
+
   context.registerTest('game-version', 'gamemode-activated',
     () => Bluebird.resolve(testGameVersions(context.api)));
   context.registerTest('game-version', 'mod-installed',
     () => Bluebird.resolve(testGameVersions(context.api)));
-
-  context.registerReducer(['persistent', 'gameMode'], persistentReducer);
 }
 
 export default init;
