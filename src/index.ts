@@ -6,6 +6,11 @@ import Bluebird from 'bluebird';
 import { selectors, types, util } from 'vortex-api';
 import { setGameVersion } from './actions';
 
+const ONE_SECOND = 1000;
+const ONE_MINUTE = 60 * ONE_SECOND;
+const ONE_HOUR = 60 * ONE_MINUTE;
+const ONE_DAY = 24 * ONE_HOUR;
+
 function isCompatible(gameId: string, mod: types.IMod, version: string): boolean {
   if (mod.attributes === undefined) {
     return true;
@@ -87,6 +92,18 @@ async function testGameVersions(api: types.IExtensionApi): Promise<types.ITestRe
   return Promise.resolve(res);
 }
 
+async function queryGameInfo(api: types.IExtensionApi,
+                             game: types.IGame & types.IDiscoveryResult)
+                             : Promise<{ [key: string]: types.IGameDetail }> {
+  const version = await getGameVersion(api, game.id);
+  return Promise.resolve({
+    game_version: {
+      title: 'Installed Version',
+      value: version,
+    },
+  });
+}
+
 function init(context: types.IExtensionContext) {
   context.registerReducer(['persistent', 'gameMode'], persistentReducer);
 
@@ -94,6 +111,9 @@ function init(context: types.IExtensionContext) {
     () => Bluebird.resolve(testGameVersions(context.api)));
   context.registerTest('game-version', 'mod-installed',
     () => Bluebird.resolve(testGameVersions(context.api)));
+
+  context.registerGameInfoProvider('game-version', 15, ONE_DAY, ['game_version'],
+                                   game => Bluebird.resolve(queryGameInfo(context.api, game)));
 }
 
 export default init;

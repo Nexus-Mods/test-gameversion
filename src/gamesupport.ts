@@ -48,20 +48,23 @@ export function getGameVersion(api: types.IExtensionApi, gameMode: string): Prom
   const game: types.IGame = util.getGame(gameMode);
   const getExecGameVersion = () => {
     const exePath = path.join(discovery.path, discovery.executable || game.executable());
-    const version: string = getVersion(exePath);
-    return Promise.resolve(version);
+    try {
+      const version: string = getVersion(exePath);
+      return Promise.resolve(version);
+    } catch (err) {
+      return Promise.resolve('Unknown');
+    }
   };
 
   const getExtGameVersion = async () => {
     try {
-      const version: string = await game.getGameVersion(discovery.path);
+      const version: string =
+        await game.getGameVersion(discovery.path, discovery.executable || game.executable());
       if (typeof version !== 'string') {
         return Promise.reject(new Error('getGameVersion functor returned an invalid type'));
       }
 
-      return (semver.valid(version) !== null)
-        ? Promise.resolve(version)
-        : Promise.reject(new Error('game extension getGameVersion functor returned an invalid version'));
+      return version;
     } catch (err) {
       return Promise.reject(err);
     }
