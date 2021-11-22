@@ -1,7 +1,4 @@
-import getVersion from 'exe-version';
-import * as path from 'path';
-import semver from 'semver';
-import { log, types, util } from 'vortex-api';
+import { types, util } from 'vortex-api';
 export type UpdateInvalidate = 'never' | 'always' | 'some';
 
 function gamebryoUpdate(seName: string) {
@@ -33,11 +30,6 @@ const gameSupport = {
 
 export function getGameVersion(api: types.IExtensionApi, gameMode: string): Promise<string> {
   // allow games to have specific functions to get at the version
-  if ((gameSupport[gameMode] !== undefined)
-      && (gameSupport[gameMode].getGameVersion !== undefined)) {
-    return gameSupport[gameMode].getGameVersion(api);
-  }
-
   // otherwise take the version stored in the executable
   const state: types.IState = api.store.getState();
   const discovery: types.IDiscoveryResult =
@@ -46,40 +38,8 @@ export function getGameVersion(api: types.IExtensionApi, gameMode: string): Prom
     return Promise.resolve(undefined);
   }
   const game: types.IGame = util.getGame(gameMode);
-  const getExecGameVersion = () => {
-    const exePath = path.join(discovery.path, discovery.executable || game.executable());
-    try {
-      const version: string = getVersion(exePath);
-      return Promise.resolve(version);
-    } catch (err) {
-      return Promise.resolve('Unknown');
-    }
-  };
 
-  const getExtGameVersion = async () => {
-    try {
-      const version: string =
-        await game.getGameVersion(discovery.path, discovery.executable || game.executable());
-      if (typeof version !== 'string') {
-        return Promise.reject(new Error('getGameVersion functor returned an invalid type'));
-      }
-
-      return version;
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-
-  return (game?.getGameVersion === undefined)
-    ? getExecGameVersion()
-    : getExtGameVersion()
-      .catch(err => {
-        log('warn', 'getGameVersion call failed', {
-          message: err.message,
-          gameMode,
-        });
-        return getExecGameVersion();
-      });
+  return game['getCurrentVersion'](discovery);
 }
 
 function compareQuadVer(lhs: string, rhs: string) {
