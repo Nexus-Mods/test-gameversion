@@ -112,7 +112,7 @@ function init(context: types.IExtensionContext) {
   context.registerTest('game-version', 'mod-installed',
     () => Bluebird.resolve(testGameVersions(context.api)));
 
-  context.registerGameInfoProvider('game-version', 15, ONE_DAY, ['game_version'],
+  context.registerGameInfoProvider('game-version', 15, 5 * ONE_MINUTE, ['game_version'],
                                    game => Bluebird.resolve(queryGameInfo(context.api, game)));
 }
 
