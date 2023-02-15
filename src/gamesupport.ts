@@ -39,7 +39,7 @@ export function getGameVersion(api: types.IExtensionApi, gameMode: string): Prom
   }
   const game: types.IGame = util.getGame(gameMode);
 
-  return game['getInstalledVersion'](discovery);
+  return Promise.resolve(game.getInstalledVersion(discovery));
 }
 
 function compareQuadVer(lhs: string, rhs: string) {

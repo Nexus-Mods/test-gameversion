@@ -2630,8 +2630,8 @@ util-deprecate@^1.0.1, util-deprecate@~1.0.1:
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
 vortex-api@Nexus-Mods/vortex-api:
-  version "1.4.14"
-  resolved "https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/b12195e0138a3fae92773941bdaa0476e480b8be"
+  version "1.8.0-r2"
+  resolved "https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/18314d002399997d527af6f8923718f2e4e1933b"
 
 vortex-parse-ini@Nexus-Mods/vortex-parse-ini:
   version "0.2.9"
