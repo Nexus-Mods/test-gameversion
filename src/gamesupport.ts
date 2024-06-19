@@ -26,6 +26,9 @@ const gameSupport = {
   fallout4: {
     updateInvalidationText: gamebryoUpdate('f4se'),
   },
+  starfield: {
+    updateInvalidationText: gamebryoUpdate('sfse'),
+  }
 };
 
 export function getGameVersion(api: types.IExtensionApi, gameMode: string): Promise<string> {
